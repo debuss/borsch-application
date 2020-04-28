@@ -1,0 +1,23 @@
+{
+  "name": "borsch/application",
+  "description": "Borsch Framework application.",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Alexandre DEBUSSCHERE",
+      "email": "zizilex@gmail.com"
+    }
+  ],
+  "require": {
+    "borsch/requesthandler": "^1",
+    "borsch/router": "^1",
+    "borsch/middlewares": "^1",
+    "laminas/laminas-diactoros": "2.2.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Borsch\\Application\\": "src/"
+    }
+  }
+}
