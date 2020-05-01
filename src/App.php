@@ -11,6 +11,7 @@ use Borsch\Router\FastRouteRouter;
 use Borsch\Router\RouterInterface;
 use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\StreamFactory;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -31,15 +32,25 @@ class App
     /** @var RouterInterface */
     protected $router;
 
+    /** @var ContainerInterface */
+    protected $container;
+
+    /** @var MiddlewareResolver */
+    protected $resolver;
+
     /**
      * App constructor.
-     * @param RequestHandlerInterface|null $request_handler
-     * @param RouterInterface|null $router
+     * @param RequestHandlerInterface $request_handler
+     * @param RouterInterface $router
+     * @param ContainerInterface $container
      */
-    public function __construct(?RequestHandlerInterface $request_handler = null, ?RouterInterface $router = null)
+    public function __construct(RequestHandlerInterface $request_handler, RouterInterface $router, ContainerInterface $container)
     {
-        $this->request_handler = $request_handler ?: new RequestHandler();
-        $this->router = $router ?: new FastRouteRouter();
+        $this->request_handler = $request_handler; // ?: new RequestHandler();
+        $this->router = $router; // ?: new FastRouteRouter();
+        $this->container = $container;
+
+        $this->resolver = new MiddlewareResolver($this->container);
     }
 
     /**
@@ -64,8 +75,8 @@ class App
         $path = $middleware === $middleware_or_path ? '/' : $middleware_or_path;
 
         $middleware = $path != '/' ?
-            new PipePathMiddleware($path, $middleware) :
-            new $middleware;
+            new PipePathMiddleware($path, $this->resolver->resolve($middleware)) :
+            $this->resolver->resolve($middleware);
 
         $this->request_handler->middleware($middleware);
     }
