@@ -42,7 +42,7 @@ class MiddlewareResolver
             return new CallableMiddleware($middleware);
         }
 
-        if (!is_string($middleware) || $middleware == '' || !class_exists($middleware)) {
+        if (!is_string($middleware) || $middleware == '') {
             throw new InvalidArgumentException('Provided middleware is not acceptable.');
         }
 
