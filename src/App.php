@@ -46,8 +46,8 @@ class App
      */
     public function __construct(RequestHandlerInterface $request_handler, RouterInterface $router, ContainerInterface $container)
     {
-        $this->request_handler = $request_handler; // ?: new RequestHandler();
-        $this->router = $router; // ?: new FastRouteRouter();
+        $this->request_handler = $request_handler;
+        $this->router = $router;
         $this->container = $container;
 
         $this->resolver = new MiddlewareResolver($this->container);
@@ -66,10 +66,10 @@ class App
     }
 
     /**
-     * @param MiddlewareInterface|string $middleware_or_path
-     * @param MiddlewareInterface|null $middleware
+     * @param string|MiddlewareInterface $middleware_or_path
+     * @param string|array|callable|MiddlewareInterface $middleware
      */
-    public function pipe($middleware_or_path, ?MiddlewareInterface $middleware = null): void
+    public function pipe($middleware_or_path, $middleware = null): void
     {
         $middleware = $middleware ?: $middleware_or_path;
         $path = $middleware === $middleware_or_path ? '/' : $middleware_or_path;
