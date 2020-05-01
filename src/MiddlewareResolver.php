@@ -8,6 +8,7 @@ namespace Borsch\Application;
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Class MiddlewareResolver
@@ -29,13 +30,17 @@ class MiddlewareResolver
     }
 
     /**
-     * @param string|array|callable|MiddlewareInterface $middleware
+     * @param string|callable|RequestHandlerInterface|MiddlewareInterface $middleware
      * @return MiddlewareInterface
      */
     public function resolve($middleware): MiddlewareInterface
     {
         if ($middleware instanceof MiddlewareInterface) {
             return $middleware;
+        }
+
+        if ($middleware instanceof RequestHandlerInterface) {
+            return new RequestHandlerMiddleware($middleware);
         }
 
         if (is_callable($middleware)) {

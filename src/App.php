@@ -6,15 +6,10 @@
 namespace Borsch\Application;
 
 use Borsch\RequestHandler\Emitter;
-use Borsch\RequestHandler\RequestHandler;
 use Borsch\Router\FastRouteRouter;
 use Borsch\Router\RouterInterface;
-use Laminas\Diactoros\ResponseFactory;
-use Laminas\Diactoros\StreamFactory;
 use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -62,11 +57,15 @@ class App
      */
     public function __call($name, $arguments)
     {
+        if (isset($arguments[1]) && strlen($arguments[1])) {
+            $arguments[1] = $this->resolver->resolve($arguments[1]);
+        }
+
         return $this->router->{$name}(...$arguments);
     }
 
     /**
-     * @param string|MiddlewareInterface $middleware_or_path
+     * @param string|array|MiddlewareInterface $middleware_or_path
      * @param string|array|callable|MiddlewareInterface $middleware
      */
     public function pipe($middleware_or_path, $middleware = null): void
@@ -86,20 +85,6 @@ class App
      */
     public function run(ServerRequestInterface $server_request): void
     {
-        $server_request = $server_request
-            ->withAttribute(
-                RouterInterface::class,
-                $this->router
-            )
-            ->withAttribute(
-                ResponseFactoryInterface::class,
-                new ResponseFactory()
-            )
-            ->withAttribute(
-                StreamFactoryInterface::class,
-                new StreamFactory()
-            );
-
         $response = $this->request_handler->handle($server_request);
 
         $emitter = new Emitter();
