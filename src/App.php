@@ -6,7 +6,6 @@
 namespace Borsch\Application;
 
 use Borsch\RequestHandler\Emitter;
-use Borsch\Router\FastRouteRouter;
 use Borsch\Router\RouterInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -16,9 +15,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 /**
  * Class App
  * @package Borsch\Application
- * @mixin FastRouteRouter
  */
-class App
+class App implements ApplicationInterface
 {
 
     /** @var RequestHandlerInterface */
@@ -49,24 +47,8 @@ class App
     }
 
     /**
-     * Used to call the router methods.
-     *
-     * @param string $name
-     * @param array $arguments
-     * @return mixed
-     */
-    public function __call($name, $arguments)
-    {
-        if (isset($arguments[1]) && strlen($arguments[1])) {
-            $arguments[1] = $this->resolver->resolve($arguments[1]);
-        }
-
-        return $this->router->{$name}(...$arguments);
-    }
-
-    /**
-     * @param string|array|MiddlewareInterface $middleware_or_path
-     * @param string|array|callable|MiddlewareInterface $middleware
+     * @param string|callable|RequestHandlerInterface|MiddlewareInterface $middleware_or_path
+     * @param string|callable|RequestHandlerInterface|MiddlewareInterface $middleware
      */
     public function pipe($middleware_or_path, $middleware = null): void
     {
@@ -89,5 +71,69 @@ class App
 
         $emitter = new Emitter();
         $emitter->emit($response);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function get(string $path, $middleware, ?string $name = null): void
+    {
+        $this->router->{__FUNCTION__}($path, $this->resolver->resolve($middleware), $name);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function post(string $path, $middleware, ?string $name = null): void
+    {
+        $this->router->{__FUNCTION__}($path, $this->resolver->resolve($middleware), $name);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function put(string $path, $middleware, ?string $name = null): void
+    {
+        $this->router->{__FUNCTION__}($path, $this->resolver->resolve($middleware), $name);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function delete(string $path, $middleware, ?string $name = null): void
+    {
+        $this->router->{__FUNCTION__}($path, $this->resolver->resolve($middleware), $name);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function path(string $path, $middleware, ?string $name = null): void
+    {
+        $this->router->{__FUNCTION__}($path, $this->resolver->resolve($middleware), $name);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function head(string $path, $middleware, ?string $name = null): void
+    {
+        $this->router->{__FUNCTION__}($path, $this->resolver->resolve($middleware), $name);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function options(string $path, $middleware, ?string $name = null): void
+    {
+        $this->router->{__FUNCTION__}($path, $this->resolver->resolve($middleware), $name);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function any(string $path, $middleware, ?string $name = null): void
+    {
+        $this->router->{__FUNCTION__}($path, $this->resolver->resolve($middleware), $name);
     }
 }
