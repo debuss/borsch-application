@@ -39,8 +39,12 @@ class LazyLoadingMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        /** @var MiddlewareInterface $middleware */
+        /** @var RequestHandlerInterface|MiddlewareInterface $middleware */
         $middleware = $this->container->get($this->middleware);
+
+        if ($middleware instanceof RequestHandlerInterface) {
+            return $middleware->handle($request);
+        }
 
         return $middleware->process($request, $handler);
     }
